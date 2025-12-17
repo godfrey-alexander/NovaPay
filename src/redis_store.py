@@ -1,6 +1,16 @@
+import os
+from urllib.parse import urlparse
 import redis
 
-redis_client = redis.Redis(host="localhost", port=6379, decode_responses=True)
+redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+parsed_url = urlparse(redis_url)
+
+redis_client = redis.Redis(
+    host=parsed_url.hostname,
+    port=parsed_url.port,
+    password=parsed_url.password,
+    decode_responses=True,
+)
 
 def update_velocity(user_id):
     key_1h = f"txn_1h:{user_id}"
