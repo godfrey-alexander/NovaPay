@@ -578,7 +578,7 @@ st.markdown("""
 # ======================
 API_BASE_URL = st.sidebar.text_input(
     "API Base URL",
-    value="http://localhost:8000",
+    value="https://novapay-production-80bc.up.railway.app",
     help="Enter the base URL of your Fraud Detection API"
 )
 
