@@ -202,9 +202,17 @@ def predict(txn: Transaction):
     # Prediction
     fraud_score = model_lgb.predict(X_transformed)[0]
 
+    # Rule-based overrides for obviously risky patterns
+    hard_block = False
+    # Example: extremely large transaction on a very new account
+    if txn.amount_usd >= 1_000_000_000 and txn.account_age_days <= 30:
+        hard_block = True
+
     # Decisioning
     decision = "ALLOW"
-    if fraud_score > 0.6:
+    if hard_block:
+        decision = "BLOCK"
+    elif fraud_score > 0.6:
         decision = "BLOCK"
         # send_email()
     elif fraud_score > 0.4:
