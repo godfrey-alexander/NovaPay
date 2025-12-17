@@ -14,7 +14,8 @@ COPY . /app
 # Install Python dependencies for the API
 RUN pip install --no-cache-dir -r /app/src/requirements.txt
 
-# Default command (Railway can override the port via start command)
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
+# Default command; use PORT if provided by the platform, else 8000.
+# Using sh -c so ${PORT:-8000} is expanded at runtime.
+CMD ["sh", "-c", "uvicorn api:app --host 0.0.0.0 --port ${PORT:-8000}"]
 
 
