@@ -488,10 +488,9 @@ st.markdown("""
         color: #fafafa;
     }
     
-    /* Hide Streamlit default elements */
+    /* Hide some Streamlit default elements but keep header (for sidebar toggle button) */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header {visibility: hidden;}
     
     /* Scrollbar styling - Dark theme */
     ::-webkit-scrollbar {
