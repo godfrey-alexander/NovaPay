@@ -79,11 +79,50 @@ FEATURE_NAMES = (
 
 
 REASON_MAP = {
-    "new_device": "New or untrusted device",
-    "ip_risk_score": "High-risk IP",
-    "location_mismatch": "Unusual location",
-    "txn_velocity_1h": "High transaction frequency",
-    "amount_usd": "Unusual transaction amount",
+    # Binary features
+    "new_device": "New or untrusted device detected",
+    "location_mismatch": "Unusual location mismatch detected",
+    
+    # Transaction amounts
+    "amount_src": "Unusual source amount",
+    "amount_usd": "Unusual transaction amount (USD)",
+    "fee": "Unusual fee amount",
+    "exchange_rate_src_to_dest": "Suspicious exchange rate",
+    
+    # Risk scores
+    "ip_risk_score": "High-risk IP address",
+    "risk_score_internal": "High internal risk score",
+    "corridor_risk": "High-risk payment corridor",
+    "device_trust_score": "Low device trust score",
+    
+    # Transaction velocity
+    "txn_velocity_1h": "High transaction frequency in last hour",
+    "txn_velocity_24h": "High transaction frequency in last 24 hours",
+    
+    # Account and user features
+    "account_age_days": "New or recently created account",
+    "chargeback_history_count": "Previous chargeback history",
+    "kyc_tier": "Low KYC verification tier",
+    
+    # Time features
+    "hour_sin": "Unusual transaction time",
+    "hour_cos": "Unusual transaction time",
+    
+    # Location and geography (one-hot encoded features)
+    "nominal__home_country_UNKNOWN": "Unknown home country",
+    "nominal__dest_country_UNKNOWN": "Unknown destination country",
+    "nominal__channel_UNKNOWN": "Unknown transaction channel",
+    
+    # Currency features (one-hot encoded)
+    "nominal__source_currency_UNKNOWN": "Unknown source currency",
+    "nominal__dest_currency_UNKNOWN": "Unknown destination currency",
+    
+    # Common one-hot encoded patterns (fallback)
+    "nominal__home_country": "Unusual home country",
+    "nominal__dest_country": "High-risk destination country",
+    "nominal__source_currency": "Unusual source currency",
+    "nominal__dest_currency": "High-risk destination currency",
+    "nominal__channel": "Unusual transaction channel",
 }
 
 # ======================
@@ -172,6 +211,29 @@ def predict(txn: Transaction):
         decision = "STEP_UP"
         # send_verification_code()
 
+    # Helper function to get reason code for a feature name
+    def get_reason_code(feature_name):
+        # Try exact match first
+        if feature_name in REASON_MAP:
+            return REASON_MAP[feature_name]
+        
+        # Try partial matches for one-hot encoded features
+        # e.g., "nominal__home_country_US" -> try "nominal__home_country" -> try "home_country"
+        if "__" in feature_name:
+            parts = feature_name.split("__")
+            if len(parts) >= 2:
+                # Try with prefix (e.g., "nominal__home_country")
+                prefix_match = f"{parts[0]}__{parts[1]}"
+                if prefix_match in REASON_MAP:
+                    return REASON_MAP[prefix_match]
+                # Try base feature name (e.g., "home_country")
+                base_name = parts[1]
+                if base_name in REASON_MAP:
+                    return REASON_MAP[base_name]
+        
+        # Fallback: return a cleaned version of the feature name
+        return feature_name.replace("_", " ").title()
+    
     # Compute SHAP reason codes
     reasons = []
     shap_values_dict = {}
@@ -179,12 +241,55 @@ def predict(txn: Transaction):
         try:
             shap_vals = explainer.shap_values(X_transformed)[1][0]  # binary classification
             top_idx = np.argsort(np.abs(shap_vals))[-3:]
-            reasons = [REASON_MAP.get(FEATURE_NAMES[i], FEATURE_NAMES[i]) for i in reversed(top_idx)]
+            reasons = [get_reason_code(FEATURE_NAMES[i]) for i in reversed(top_idx)]
 
             # Log SHAP values for top features
             shap_values_dict = {FEATURE_NAMES[i]: float(shap_vals[i]) for i in range(len(FEATURE_NAMES))}
         except Exception as e:
             logging.warning(f"SHAP computation failed for user {txn.user_id}: {e}")
+            # Fallback: provide basic reasons based on transaction features
+            if not reasons:
+                # Check binary flags first
+                if txn.new_device:
+                    reasons.append(REASON_MAP.get("new_device", "New or untrusted device detected"))
+                if txn.location_mismatch:
+                    reasons.append(REASON_MAP.get("location_mismatch", "Unusual location mismatch detected"))
+                
+                # Check risk scores
+                if txn.ip_risk_score > 0.5:
+                    reasons.append(REASON_MAP.get("ip_risk_score", "High-risk IP address"))
+                if txn.risk_score_internal > 0.5:
+                    reasons.append(REASON_MAP.get("risk_score_internal", "High internal risk score"))
+                if txn.corridor_risk > 0.5:
+                    reasons.append(REASON_MAP.get("corridor_risk", "High-risk payment corridor"))
+                if txn.device_trust_score < 0.3:
+                    reasons.append(REASON_MAP.get("device_trust_score", "Low device trust score"))
+                
+                # Check transaction velocity
+                if v1 > 10:
+                    reasons.append(REASON_MAP.get("txn_velocity_1h", "High transaction frequency in last hour"))
+                if v24 > 50:
+                    reasons.append(REASON_MAP.get("txn_velocity_24h", "High transaction frequency in last 24 hours"))
+                
+                # Check account age
+                if txn.account_age_days < 30:
+                    reasons.append(REASON_MAP.get("account_age_days", "New or recently created account"))
+                
+                # Check chargeback history
+                if txn.chargeback_history_count > 0:
+                    reasons.append(REASON_MAP.get("chargeback_history_count", "Previous chargeback history"))
+                
+                # Check transaction amounts
+                if txn.amount_usd > 1000:
+                    reasons.append(REASON_MAP.get("amount_usd", "Unusual transaction amount (USD)"))
+                
+                # Check KYC tier
+                if txn.kyc_tier.upper() in ["LOW", "UNKNOWN"]:
+                    reasons.append(REASON_MAP.get("kyc_tier", "Low KYC verification tier"))
+                
+                # If still no reasons, provide generic message
+                if not reasons:
+                    reasons.append(f"Fraud score ({fraud_score:.3f}) exceeds threshold")
 
     # Prepare result
     result = {
