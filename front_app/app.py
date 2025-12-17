@@ -116,14 +116,14 @@ st.markdown("""
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
-    /* Main header with glassmorphism */
+    /* Main header with glassmorphism - compact for above-the-fold layout */
     .main-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-        padding: 3rem 2rem;
-        border-radius: 20px;
+        padding: 1.6rem 1.4rem;
+        border-radius: 16px;
         color: white;
         text-align: center;
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.2rem;
         box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4),
                     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
         position: relative;
@@ -149,9 +149,9 @@ st.markdown("""
     
     .main-header h1 {
         color: white;
-        font-size: 3rem;
+        font-size: 2.2rem;
         font-weight: 800;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.3rem;
         text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
         letter-spacing: -0.5px;
         position: relative;
@@ -160,7 +160,7 @@ st.markdown("""
     
     .main-header p {
         color: rgba(255, 255, 255, 0.95);
-        font-size: 1.2rem;
+        font-size: 1rem;
         margin: 0;
         font-weight: 300;
         position: relative;
@@ -227,42 +227,42 @@ st.markdown("""
     .decision-block {
         background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 50%, #c92a2a 100%);
         color: white;
-        padding: 1.5rem 2rem;
-        border-radius: 16px;
+        padding: 1rem 1.4rem;
+        border-radius: 12px;
         text-align: center;
         font-weight: 700;
-        font-size: 1.5rem;
+        font-size: 1.2rem;
         box-shadow: 0 10px 30px rgba(238, 90, 111, 0.4),
                     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-        margin: 1rem 0;
+        margin: 0.6rem 0;
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
     .decision-step {
         background: linear-gradient(135deg, #ffd43b 0%, #ffa94d 50%, #f08c00 100%);
         color: white;
-        padding: 1.5rem 2rem;
-        border-radius: 16px;
+        padding: 1rem 1.4rem;
+        border-radius: 12px;
         text-align: center;
         font-weight: 700;
-        font-size: 1.5rem;
+        font-size: 1.2rem;
         box-shadow: 0 10px 30px rgba(255, 168, 77, 0.4),
                     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-        margin: 1rem 0;
+        margin: 0.6rem 0;
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
     .decision-allow {
         background: linear-gradient(135deg, #51cf66 0%, #40c057 50%, #2b8a3e 100%);
         color: white;
-        padding: 1.5rem 2rem;
-        border-radius: 16px;
+        padding: 1rem 1.4rem;
+        border-radius: 12px;
         text-align: center;
         font-weight: 700;
-        font-size: 1.5rem;
+        font-size: 1.2rem;
         box-shadow: 0 10px 30px rgba(64, 192, 87, 0.4),
                     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-        margin: 1rem 0;
+        margin: 0.6rem 0;
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
@@ -274,10 +274,10 @@ st.markdown("""
     .fraud-card {
         background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 50%, #c92a2a 100%);
         color: white;
-        padding: 3rem 2rem;
-        border-radius: 24px;
+        padding: 1.6rem 1.4rem;
+        border-radius: 16px;
         text-align: center;
-        box-shadow: 0 20px 60px rgba(238, 90, 111, 0.4),
+        box-shadow: 0 14px 40px rgba(238, 90, 111, 0.4),
                     0 0 0 1px rgba(255, 255, 255, 0.1) inset,
                     0 0 100px rgba(255, 107, 107, 0.2);
         position: relative;
@@ -293,10 +293,10 @@ st.markdown("""
     .legitimate-card {
         background: linear-gradient(135deg, #51cf66 0%, #40c057 50%, #2b8a3e 100%);
         color: white;
-        padding: 3rem 2rem;
-        border-radius: 24px;
+        padding: 1.6rem 1.4rem;
+        border-radius: 16px;
         text-align: center;
-        box-shadow: 0 20px 60px rgba(64, 192, 87, 0.4),
+        box-shadow: 0 14px 40px rgba(64, 192, 87, 0.4),
                     0 0 0 1px rgba(255, 255, 255, 0.1) inset,
                     0 0 100px rgba(81, 207, 102, 0.2);
         position: relative;
@@ -776,7 +776,7 @@ with col2:
                         }
                     }
                 ))
-                fig.update_layout(height=300, margin={'t': 10, 'b': 10, 'l': 0, 'r': 0})
+                fig.update_layout(height=230, margin={'t': 10, 'b': 0, 'l': 0, 'r': 0})
                 st.plotly_chart(fig, use_container_width=True)
                 
                 # Decision Card
