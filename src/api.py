@@ -234,7 +234,50 @@ def predict(txn: Transaction):
         # Fallback: return a cleaned version of the feature name
         return feature_name.replace("_", " ").title()
     
-    # Compute SHAP reason codes
+    # Helper function to get fallback reasons based on transaction features
+    def get_fallback_reasons():
+        fallback = []
+        # Check binary flags first
+        if txn.new_device:
+            fallback.append(REASON_MAP.get("new_device", "New or untrusted device detected"))
+        if txn.location_mismatch:
+            fallback.append(REASON_MAP.get("location_mismatch", "Unusual location mismatch detected"))
+        
+        # Check risk scores
+        if txn.ip_risk_score > 0.5:
+            fallback.append(REASON_MAP.get("ip_risk_score", "High-risk IP address"))
+        if txn.risk_score_internal > 0.5:
+            fallback.append(REASON_MAP.get("risk_score_internal", "High internal risk score"))
+        if txn.corridor_risk > 0.5:
+            fallback.append(REASON_MAP.get("corridor_risk", "High-risk payment corridor"))
+        if txn.device_trust_score < 0.3:
+            fallback.append(REASON_MAP.get("device_trust_score", "Low device trust score"))
+        
+        # Check transaction velocity
+        if v1 > 10:
+            fallback.append(REASON_MAP.get("txn_velocity_1h", "High transaction frequency in last hour"))
+        if v24 > 50:
+            fallback.append(REASON_MAP.get("txn_velocity_24h", "High transaction frequency in last 24 hours"))
+        
+        # Check account age
+        if txn.account_age_days < 30:
+            fallback.append(REASON_MAP.get("account_age_days", "New or recently created account"))
+        
+        # Check chargeback history
+        if txn.chargeback_history_count > 0:
+            fallback.append(REASON_MAP.get("chargeback_history_count", "Previous chargeback history"))
+        
+        # Check transaction amounts
+        if txn.amount_usd > 1000:
+            fallback.append(REASON_MAP.get("amount_usd", "Unusual transaction amount (USD)"))
+        
+        # Check KYC tier
+        if txn.kyc_tier.upper() in ["LOW", "UNKNOWN"]:
+            fallback.append(REASON_MAP.get("kyc_tier", "Low KYC verification tier"))
+        
+        return fallback
+    
+    # Compute SHAP reason codes - always return exactly 3 reasons
     reasons = []
     shap_values_dict = {}
     if decision != "ALLOW":
@@ -247,49 +290,26 @@ def predict(txn: Transaction):
             shap_values_dict = {FEATURE_NAMES[i]: float(shap_vals[i]) for i in range(len(FEATURE_NAMES))}
         except Exception as e:
             logging.warning(f"SHAP computation failed for user {txn.user_id}: {e}")
-            # Fallback: provide basic reasons based on transaction features
-            if not reasons:
-                # Check binary flags first
-                if txn.new_device:
-                    reasons.append(REASON_MAP.get("new_device", "New or untrusted device detected"))
-                if txn.location_mismatch:
-                    reasons.append(REASON_MAP.get("location_mismatch", "Unusual location mismatch detected"))
-                
-                # Check risk scores
-                if txn.ip_risk_score > 0.5:
-                    reasons.append(REASON_MAP.get("ip_risk_score", "High-risk IP address"))
-                if txn.risk_score_internal > 0.5:
-                    reasons.append(REASON_MAP.get("risk_score_internal", "High internal risk score"))
-                if txn.corridor_risk > 0.5:
-                    reasons.append(REASON_MAP.get("corridor_risk", "High-risk payment corridor"))
-                if txn.device_trust_score < 0.3:
-                    reasons.append(REASON_MAP.get("device_trust_score", "Low device trust score"))
-                
-                # Check transaction velocity
-                if v1 > 10:
-                    reasons.append(REASON_MAP.get("txn_velocity_1h", "High transaction frequency in last hour"))
-                if v24 > 50:
-                    reasons.append(REASON_MAP.get("txn_velocity_24h", "High transaction frequency in last 24 hours"))
-                
-                # Check account age
-                if txn.account_age_days < 30:
-                    reasons.append(REASON_MAP.get("account_age_days", "New or recently created account"))
-                
-                # Check chargeback history
-                if txn.chargeback_history_count > 0:
-                    reasons.append(REASON_MAP.get("chargeback_history_count", "Previous chargeback history"))
-                
-                # Check transaction amounts
-                if txn.amount_usd > 1000:
-                    reasons.append(REASON_MAP.get("amount_usd", "Unusual transaction amount (USD)"))
-                
-                # Check KYC tier
-                if txn.kyc_tier.upper() in ["LOW", "UNKNOWN"]:
-                    reasons.append(REASON_MAP.get("kyc_tier", "Low KYC verification tier"))
-                
-                # If still no reasons, provide generic message
-                if not reasons:
-                    reasons.append(f"Fraud score ({fraud_score:.3f}) exceeds threshold")
+        
+        # Ensure we have exactly 3 reasons
+        if len(reasons) < 3:
+            fallback_reasons = get_fallback_reasons()
+            # Add fallback reasons that aren't already in the list
+            for reason in fallback_reasons:
+                if reason not in reasons and len(reasons) < 3:
+                    reasons.append(reason)
+        
+        # If still fewer than 3, pad with generic reasons
+        while len(reasons) < 3:
+            if decision == "BLOCK":
+                reasons.append(f"Fraud score ({fraud_score:.3f}) exceeds block threshold (0.6)")
+            elif decision == "STEP_UP":
+                reasons.append(f"Fraud score ({fraud_score:.3f}) exceeds step-up threshold (0.4)")
+            else:
+                reasons.append("Transaction flagged by risk model")
+        
+        # Take only the first 3 reasons
+        reasons = reasons[:3]
 
     # Prepare result
     result = {

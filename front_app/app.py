@@ -795,12 +795,13 @@ with col2:
                     st.markdown(f'<div class="decision-allow">{decision_icon} {decision}</div>', unsafe_allow_html=True)
                     st.success("✅ This transaction appears to be low risk.")
                 
-                # Reason Codes - Display prominently right after decision
+                # Reason Codes - Display prominently right after decision (always 3 reasons)
                 if decision in ["BLOCK", "STEP_UP"]:
                     st.markdown("---")
-                    st.markdown("#### 🎯 Why was this transaction flagged?")
+                    st.markdown("#### 🎯 Top 3 Reasons This Transaction Was Flagged")
                     if reason_codes:
-                        for i, reason in enumerate(reason_codes, 1):
+                        # Display exactly 3 reasons (API ensures we always get 3)
+                        for i, reason in enumerate(reason_codes[:3], 1):
                             st.markdown(f"""
                             <div style='background: rgba(255, 107, 107, 0.15); border-left: 4px solid #ff6b6b; 
                                         padding: 1rem; border-radius: 8px; margin: 0.5rem 0;'>
