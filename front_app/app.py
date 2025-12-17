@@ -590,7 +590,12 @@ def check_api_health():
     try:
         response = requests.get(f"{API_BASE_URL}/health", timeout=5)
         return response.status_code == 200
-    except:
+    except Exception as e:
+        # Surface the actual connection error in the sidebar to help debugging
+        try:
+            st.sidebar.error(f"API health check failed: {e}")
+        except Exception:
+            pass
         return False
 
 def predict_fraud(transaction_data):
