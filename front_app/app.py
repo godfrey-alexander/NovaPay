@@ -761,6 +761,7 @@ with col2:
                     domain = {'x': [0, 1], 'y': [0, 1]},
                     title = {'text': "Risk Score"},
                     delta = {'reference': 0.5},
+                    number = {'valueformat': '.3f'},
                     gauge = {
                         'axis': {'range': [None, 1]},
                         'bar': {'color': get_decision_color(decision)},
@@ -794,13 +795,20 @@ with col2:
                     st.markdown(f'<div class="decision-allow">{decision_icon} {decision}</div>', unsafe_allow_html=True)
                     st.success("✅ This transaction appears to be low risk.")
                 
-                # Reason Codes
-                if reason_codes:
-                    st.markdown("#### 🎯 Risk Factors")
-                    st.markdown('<div class="info-box">', unsafe_allow_html=True)
-                    for i, reason in enumerate(reason_codes, 1):
-                        st.markdown(f"**{i}.** {reason}")
-                    st.markdown('</div>', unsafe_allow_html=True)
+                # Reason Codes - Display prominently right after decision
+                if decision in ["BLOCK", "STEP_UP"]:
+                    st.markdown("---")
+                    st.markdown("#### 🎯 Why was this transaction flagged?")
+                    if reason_codes:
+                        for i, reason in enumerate(reason_codes, 1):
+                            st.markdown(f"""
+                            <div style='background: rgba(255, 107, 107, 0.15); border-left: 4px solid #ff6b6b; 
+                                        padding: 1rem; border-radius: 8px; margin: 0.5rem 0;'>
+                                <strong>{i}.</strong> {reason}
+                            </div>
+                            """, unsafe_allow_html=True)
+                    else:
+                        st.info("Risk factors are being analyzed. Please check back shortly.")
                 
                 # Transaction Summary
                 st.markdown("#### 📋 Transaction Summary")
@@ -809,7 +817,7 @@ with col2:
                              "Channel", "IP Risk Score", "Device Trust Score", "Fraud Score", "Decision"],
                     "Value": [user_id, f"${amount_usd:,.2f}", source_currency, dest_currency, 
                              channel, f"{ip_risk_score:.2f}", f"{device_trust_score:.2f}", 
-                             f"{fraud_score:.4f}", decision]
+                             f"{fraud_score:.3f}", decision]
                 }
                 summary_df = pd.DataFrame(summary_data)
                 st.dataframe(summary_df, use_container_width=True, hide_index=True)
