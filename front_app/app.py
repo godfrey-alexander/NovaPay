@@ -923,9 +923,9 @@ with tab1:
                     mode = "gauge",
                     value = fraud_score,
                     domain = {'x': [0, 1], 'y': [0, 1]},
-                    title = {'text': "Risk Score", 'font': {'size': 14}},
+                    title = {'text': "Risk Score"},
                     gauge = {
-                        'axis': {'range': [None, 1], 'tickfont': {'size': 10}},
+                        'axis': {'range': [None, 1]},
                         'bar': {'color': get_decision_color(decision)},
                         'steps': [
                             {'range': [0, 0.4], 'color': "lightgray"},
@@ -933,13 +933,13 @@ with tab1:
                             {'range': [0.6, 1], 'color': "red"}
                         ],
                         'threshold': {
-                            'line': {'color': "red", 'width': 3},
-                            'thickness': 0.6,
+                            'line': {'color': "red", 'width': 4},
+                            'thickness': 0.75,
                             'value': 0.6
                         }
                     }
                 ))
-                fig.update_layout(height=150, margin={'t': 5, 'b': 5, 'l': 10, 'r': 10})
+                fig.update_layout(height=230, margin={'t': 10, 'b': 10, 'l': 0, 'r': 0})
                 st.plotly_chart(fig, use_container_width=True)
                 
                 # Decision Card - Compact
