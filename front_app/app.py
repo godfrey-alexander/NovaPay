@@ -768,11 +768,14 @@ with st.sidebar:
         else:
             st.error("❌ API is not connected. Please check the API status above.")
 
-# Main content area
-col1, col2 = st.columns([1, 1])
+# Main content area with tabs
+tab1, tab2 = st.tabs(["🔍 Single Transaction", "📊 Batch Processing"])
 
-with col1:
-    st.markdown("### 📝 Transaction Details")
+with tab1:
+    col1, col2 = st.columns([1, 1])
+    
+    with col1:
+        st.markdown("### 📝 Transaction Details")
     
     with st.form("fraud_prediction_form"):
         # User Information
@@ -815,50 +818,50 @@ with col1:
         
         # Submit button
         submitted = st.form_submit_button("🔍 Analyze Transaction", use_container_width=True)
-
-with col2:
-    st.markdown("### 📊 Prediction Results")
     
-    if submitted:
-        if not user_id:
-            st.error("⚠️ Please enter a User ID")
-        else:
-            # Prepare transaction data
-            transaction_data = {
-                "user_id": user_id,
-                "amount_src": float(amount_src),
-                "amount_usd": float(amount_usd),
-                "fee": float(fee),
-                "exchange_rate_src_to_dest": float(exchange_rate_src_to_dest),
-                "ip_risk_score": float(ip_risk_score),
-                "chargeback_history_count": int(chargeback_history_count),
-                "risk_score_internal": float(risk_score_internal),
-                "account_age_days": int(account_age_days),
-                "device_trust_score": float(device_trust_score),
-                "corridor_risk": float(corridor_risk),
-                "home_country": home_country,
-                "source_currency": source_currency,
-                "dest_currency": dest_currency,
-                "channel": channel,
-                "ip_country": ip_country,
-                "kyc_tier": kyc_tier,
-                "new_device": int(new_device),
-                "location_mismatch": int(location_mismatch),
-                "hour": int(hour)
-            }
-            
-            # Show loading
-            with st.spinner("🔄 Analyzing transaction..."):
-                result, error = predict_fraud(transaction_data)
-            
-            if error:
-                st.error(f"❌ Error: {error}")
-                st.info("Please check your API connection and try again.")
+    with col2:
+        st.markdown("### 📊 Prediction Results")
+        
+        if submitted:
+            if not user_id:
+                st.error("⚠️ Please enter a User ID")
             else:
-                # Display results
-                fraud_score = result.get("fraud_score", 0)
-                decision = result.get("decision", "ALLOW")
-                reason_codes = result.get("reason_codes", [])
+                # Prepare transaction data
+                transaction_data = {
+                    "user_id": user_id,
+                    "amount_src": float(amount_src),
+                    "amount_usd": float(amount_usd),
+                    "fee": float(fee),
+                    "exchange_rate_src_to_dest": float(exchange_rate_src_to_dest),
+                    "ip_risk_score": float(ip_risk_score),
+                    "chargeback_history_count": int(chargeback_history_count),
+                    "risk_score_internal": float(risk_score_internal),
+                    "account_age_days": int(account_age_days),
+                    "device_trust_score": float(device_trust_score),
+                    "corridor_risk": float(corridor_risk),
+                    "home_country": home_country,
+                    "source_currency": source_currency,
+                    "dest_currency": dest_currency,
+                    "channel": channel,
+                    "ip_country": ip_country,
+                    "kyc_tier": kyc_tier,
+                    "new_device": int(new_device),
+                    "location_mismatch": int(location_mismatch),
+                    "hour": int(hour)
+                }
+                
+                # Show loading
+                with st.spinner("🔄 Analyzing transaction..."):
+                    result, error = predict_fraud(transaction_data)
+                
+                if error:
+                    st.error(f"❌ Error: {error}")
+                    st.info("Please check your API connection and try again.")
+                else:
+                    # Display results
+                    fraud_score = result.get("fraud_score", 0)
+                    decision = result.get("decision", "ALLOW")
+                    reason_codes = result.get("reason_codes", [])
                 
 
 
@@ -945,8 +948,8 @@ with col2:
                     file_name=f"fraud_prediction_{user_id}_{int(time.time())}.json",
                     mime="application/json"
                 )
-    else:
-        st.info("👈 Fill out the form on the left and click 'Analyze Transaction' to get started.")
+        else:
+            st.info("👈 Fill out the form on the left and click 'Analyze Transaction' to get started.")
         
         # Show example transaction
         with st.expander("📖 Example Transaction Format"):
@@ -972,6 +975,154 @@ with col2:
                 "location_mismatch": 0,
                 "hour": 14
             })
+
+with tab2:
+    st.markdown("### 📊 Batch Transaction Processing")
+    st.info("📋 Upload a CSV file with multiple transactions. Each row will be processed and predictions will be generated.")
+    
+    # CSV file uploader
+    uploaded_file = st.file_uploader(
+        "Choose a CSV file",
+        type=['csv'],
+        help="CSV file should contain columns: user_id, amount_src, amount_usd, fee, exchange_rate_src_to_dest, ip_risk_score, chargeback_history_count, risk_score_internal, account_age_days, device_trust_score, corridor_risk, home_country, source_currency, dest_currency, channel, ip_country, kyc_tier, new_device, location_mismatch, hour"
+    )
+    
+    if uploaded_file is not None:
+        try:
+            # Read CSV file
+            df = pd.read_csv(uploaded_file)
+            
+            # Required columns
+            required_columns = [
+                'user_id', 'amount_src', 'amount_usd', 'fee', 'exchange_rate_src_to_dest',
+                'ip_risk_score', 'chargeback_history_count', 'risk_score_internal',
+                'account_age_days', 'device_trust_score', 'corridor_risk',
+                'home_country', 'source_currency', 'dest_currency', 'channel',
+                'ip_country', 'kyc_tier', 'new_device', 'location_mismatch', 'hour'
+            ]
+            
+            # Check if all required columns are present
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            
+            if missing_columns:
+                st.error(f"❌ Missing required columns: {', '.join(missing_columns)}")
+                st.info("Please ensure your CSV file contains all required columns.")
+            else:
+                st.success(f"✅ CSV file loaded successfully! Found {len(df)} transactions.")
+                
+                # Show preview
+                with st.expander("📋 Preview first 5 rows"):
+                    st.dataframe(df.head(), use_container_width=True)
+                
+                # Process button
+                if st.button("🚀 Process All Transactions", use_container_width=True, type="primary"):
+                    if not check_api_health():
+                        st.error("❌ API is not connected. Please check the API status in the sidebar.")
+                    else:
+                        results = []
+                        progress_bar = st.progress(0)
+                        status_text = st.empty()
+                        
+                        total_rows = len(df)
+                        
+                        for idx, row in df.iterrows():
+                            # Update progress
+                            progress = (idx + 1) / total_rows
+                            progress_bar.progress(progress)
+                            status_text.text(f"Processing transaction {idx + 1} of {total_rows}...")
+                            
+                            # Prepare transaction data
+                            transaction_data = {
+                                "user_id": str(row['user_id']),
+                                "amount_src": float(row['amount_src']),
+                                "amount_usd": float(row['amount_usd']),
+                                "fee": float(row['fee']),
+                                "exchange_rate_src_to_dest": float(row['exchange_rate_src_to_dest']),
+                                "ip_risk_score": float(row['ip_risk_score']),
+                                "chargeback_history_count": int(row['chargeback_history_count']),
+                                "risk_score_internal": float(row['risk_score_internal']),
+                                "account_age_days": int(row['account_age_days']),
+                                "device_trust_score": float(row['device_trust_score']),
+                                "corridor_risk": float(row['corridor_risk']),
+                                "home_country": str(row['home_country']),
+                                "source_currency": str(row['source_currency']),
+                                "dest_currency": str(row['dest_currency']),
+                                "channel": str(row['channel']),
+                                "ip_country": str(row['ip_country']),
+                                "kyc_tier": str(row['kyc_tier']),
+                                "new_device": int(row['new_device']),
+                                "location_mismatch": int(row['location_mismatch']),
+                                "hour": int(row['hour'])
+                            }
+                            
+                            # Get prediction
+                            result, error = predict_fraud(transaction_data)
+                            
+                            if error:
+                                results.append({
+                                    "user_id": str(row['user_id']),
+                                    "fraud_score": None,
+                                    "decision": "ERROR",
+                                    "error": error,
+                                    "reason_codes": []
+                                })
+                            else:
+                                results.append({
+                                    "user_id": str(row['user_id']),
+                                    "fraud_score": result.get("fraud_score", 0),
+                                    "decision": result.get("decision", "ALLOW"),
+                                    "reason_codes": ", ".join(result.get("reason_codes", [])),
+                                    "error": None
+                                })
+                        
+                        progress_bar.empty()
+                        status_text.empty()
+                        
+                        # Create results DataFrame
+                        results_df = pd.DataFrame(results)
+                        
+                        # Merge with original data
+                        output_df = df.copy()
+                        output_df['fraud_score'] = results_df['fraud_score']
+                        output_df['decision'] = results_df['decision']
+                        output_df['reason_codes'] = results_df['reason_codes']
+                        if results_df['error'].notna().any():
+                            output_df['error'] = results_df['error']
+                        
+                        # Display results
+                        st.success(f"✅ Successfully processed {len(results)} transactions!")
+                        
+                        # Summary statistics
+                        col1, col2, col3, col4 = st.columns(4)
+                        with col1:
+                            st.metric("Total Transactions", len(results))
+                        with col2:
+                            allowed = len(results_df[results_df['decision'] == 'ALLOW'])
+                            st.metric("Allowed", allowed, delta=f"{allowed/len(results)*100:.1f}%")
+                        with col3:
+                            blocked = len(results_df[results_df['decision'] == 'BLOCK'])
+                            st.metric("Blocked", blocked, delta=f"{blocked/len(results)*100:.1f}%")
+                        with col4:
+                            step_up = len(results_df[results_df['decision'] == 'STEP_UP'])
+                            st.metric("Step Up", step_up, delta=f"{step_up/len(results)*100:.1f}%")
+                        
+                        # Display results table
+                        st.markdown("### 📊 Batch Results")
+                        st.dataframe(output_df, use_container_width=True, height=400)
+                        
+                        # Download results
+                        csv = output_df.to_csv(index=False)
+                        st.download_button(
+                            label="📥 Download Results as CSV",
+                            data=csv,
+                            file_name=f"fraud_predictions_batch_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
+                            mime="text/csv",
+                            use_container_width=True
+                        )
+                        
+        except Exception as e:
+            st.error(f"❌ Error reading CSV file: {str(e)}")
+            st.info("Please ensure your CSV file is properly formatted and contains all required columns.")
 
 # Footer
 st.markdown("---")
