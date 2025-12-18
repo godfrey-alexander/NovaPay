@@ -915,15 +915,17 @@ with tab1:
                 
 
 
-                # Fraud Score Gauge (without number/delta display) - Compact
+                # Fraud Score Gauge with number and delta display
                 st.markdown("#### Fraud Risk Score")
                 # Reduce spacing
                 st.markdown("<div style='margin-bottom: 0.3rem;'></div>", unsafe_allow_html=True)
                 fig = go.Figure(go.Indicator(
-                    mode = "gauge",
+                    mode = "gauge+number+delta",
                     value = fraud_score,
                     domain = {'x': [0, 1], 'y': [0, 1]},
                     title = {'text': "Risk Score"},
+                    delta = {'reference': 0.5},
+                    number = {'valueformat': '.3f'},
                     gauge = {
                         'axis': {'range': [None, 1]},
                         'bar': {'color': get_decision_color(decision)},
@@ -939,7 +941,7 @@ with tab1:
                         }
                     }
                 ))
-                fig.update_layout(height=230, margin={'t': 10, 'b': 10, 'l': 0, 'r': 0})
+                fig.update_layout(height=300, margin={'t': 10, 'b': 10, 'l': 0, 'r': 0})
                 st.plotly_chart(fig, use_container_width=True)
                 
                 # Decision Card - Compact
