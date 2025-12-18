@@ -628,11 +628,34 @@ st.markdown("""
     /* Compact form sections */
     [data-testid="stForm"] {
         padding: 0.5rem 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
     
     /* Reduce spacing between form elements */
     .stForm > div {
         margin-bottom: 0.3rem !important;
+    }
+    
+    /* Ensure columns stay within their boundaries */
+    [data-testid="column"] {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    /* Prevent form from expanding beyond column */
+    .stForm {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+    
+    /* Ensure all form elements respect column width */
+    .stForm input,
+    .stForm select,
+    .stForm .stSlider {
+        width: 100% !important;
+        max-width: 100% !important;
     }
     
     /* Success/Error/Info/Warning messages - Larger fonts */
@@ -793,48 +816,48 @@ with tab1:
     
     with col1:
         st.markdown("### 📝 Transaction Details")
-    
-    with st.form("fraud_prediction_form"):
-        # User Information
-        st.markdown("#### 👤 User Information")
-        user_id = st.text_input("User ID", value="", placeholder="Enter user ID")
-        account_age_days = st.number_input("Account Age (days)", min_value=0, value=30, step=1)
-        kyc_tier = st.selectbox("KYC Tier", ["LOW", "STANDARD", "ENHANCED", "UNKNOWN"], index=0)
         
-        # Transaction Amounts
-        st.markdown("#### 💰 Transaction Amounts")
-        amount_src = st.number_input("Source Amount", min_value=0.0, value=100.0, step=0.01, format="%.2f")
-        amount_usd = st.number_input("Amount (USD)", min_value=0.0, value=100.0, step=0.01, format="%.2f")
-        fee = st.number_input("Fee", min_value=0.0, value=2.5, step=0.01, format="%.2f")
-        exchange_rate_src_to_dest = st.number_input("Exchange Rate", min_value=0.0, value=1.0, step=0.01, format="%.4f")
-        
-        # Location & Geography
-        st.markdown("#### 🌍 Location & Geography")
-        home_country = st.selectbox("Home Country", ["US", "CA", "UK", "UNKNOWN"], index=0)
-        ip_country = st.selectbox("IP Country", ["US", "CA", "UK", "UNKNOWN"], index=0)
-        source_currency = st.selectbox("Source Currency", ["USD", "CAD", "GBP"], index=0)
-        dest_currency = st.selectbox("Destination Currency", ["USD", "CAD", "GBP", "EUR", "NGN", "INR", "MXN", "CNY", "PHP"], index=0)
-        channel = st.selectbox("Channel", ["WEB", "MOBILE", "ATM", "UNKNOWN"], index=0)
-        
-        # Risk Scores
-        st.markdown("#### ⚠️ Risk Indicators")
-        ip_risk_score = st.slider("IP Risk Score", min_value=0.0, max_value=1.0, value=0.1, step=0.01)
-        risk_score_internal = st.slider("Internal Risk Score", min_value=0.0, max_value=1.0, value=0.3, step=0.01)
-        corridor_risk = st.slider("Corridor Risk", min_value=0.0, max_value=1.0, value=0.2, step=0.01)
-        device_trust_score = st.slider("Device Trust Score", min_value=0.0, max_value=1.0, value=0.5, step=0.01)
-        
-        # Additional Information
-        st.markdown("#### 📊 Additional Information")
-        chargeback_history_count = st.number_input("Chargeback History Count", min_value=0, value=0, step=1)
-        new_device = st.selectbox("New Device", [0, 1], index=0, format_func=lambda x: "No" if x == 0 else "Yes")
-        location_mismatch = st.selectbox("Location Mismatch", [0, 1], index=0, format_func=lambda x: "No" if x == 0 else "Yes")
-        
-        # Time Information
-        current_hour = datetime.now().hour
-        hour = st.number_input("Transaction Hour (0-23)", min_value=0, max_value=23, value=current_hour, step=1)
-        
-        # Submit button
-        submitted = st.form_submit_button("🔍 Analyze Transaction", use_container_width=True)
+        with st.form("fraud_prediction_form"):
+            # User Information
+            st.markdown("#### 👤 User Information")
+            user_id = st.text_input("User ID", value="", placeholder="Enter user ID")
+            account_age_days = st.number_input("Account Age (days)", min_value=0, value=30, step=1)
+            kyc_tier = st.selectbox("KYC Tier", ["LOW", "STANDARD", "ENHANCED", "UNKNOWN"], index=0)
+            
+            # Transaction Amounts
+            st.markdown("#### 💰 Transaction Amounts")
+            amount_src = st.number_input("Source Amount", min_value=0.0, value=100.0, step=0.01, format="%.2f")
+            amount_usd = st.number_input("Amount (USD)", min_value=0.0, value=100.0, step=0.01, format="%.2f")
+            fee = st.number_input("Fee", min_value=0.0, value=2.5, step=0.01, format="%.2f")
+            exchange_rate_src_to_dest = st.number_input("Exchange Rate", min_value=0.0, value=1.0, step=0.01, format="%.4f")
+            
+            # Location & Geography
+            st.markdown("#### 🌍 Location & Geography")
+            home_country = st.selectbox("Home Country", ["US", "CA", "UK", "UNKNOWN"], index=0)
+            ip_country = st.selectbox("IP Country", ["US", "CA", "UK", "UNKNOWN"], index=0)
+            source_currency = st.selectbox("Source Currency", ["USD", "CAD", "GBP"], index=0)
+            dest_currency = st.selectbox("Destination Currency", ["USD", "CAD", "GBP", "EUR", "NGN", "INR", "MXN", "CNY", "PHP"], index=0)
+            channel = st.selectbox("Channel", ["WEB", "MOBILE", "ATM", "UNKNOWN"], index=0)
+            
+            # Risk Scores
+            st.markdown("#### ⚠️ Risk Indicators")
+            ip_risk_score = st.slider("IP Risk Score", min_value=0.0, max_value=1.0, value=0.1, step=0.01)
+            risk_score_internal = st.slider("Internal Risk Score", min_value=0.0, max_value=1.0, value=0.3, step=0.01)
+            corridor_risk = st.slider("Corridor Risk", min_value=0.0, max_value=1.0, value=0.2, step=0.01)
+            device_trust_score = st.slider("Device Trust Score", min_value=0.0, max_value=1.0, value=0.5, step=0.01)
+            
+            # Additional Information
+            st.markdown("#### 📊 Additional Information")
+            chargeback_history_count = st.number_input("Chargeback History Count", min_value=0, value=0, step=1)
+            new_device = st.selectbox("New Device", [0, 1], index=0, format_func=lambda x: "No" if x == 0 else "Yes")
+            location_mismatch = st.selectbox("Location Mismatch", [0, 1], index=0, format_func=lambda x: "No" if x == 0 else "Yes")
+            
+            # Time Information
+            current_hour = datetime.now().hour
+            hour = st.number_input("Transaction Hour (0-23)", min_value=0, max_value=23, value=current_hour, step=1)
+            
+            # Submit button
+            submitted = st.form_submit_button("🔍 Analyze Transaction", use_container_width=True)
     
     with col2:
         st.markdown("### 📊 Prediction Results")
