@@ -195,19 +195,21 @@ st.markdown("""
         letter-spacing: -0.5px;
     }
     
-    /* Section headers (h3, h4) - Larger fonts */
+    /* Section headers (h3, h4) - Compact for form */
     h3 {
         color: #fafafa !important;
-        font-size: 1.8rem !important;
+        font-size: 1.3rem !important;
         font-weight: 700 !important;
-        margin-bottom: 1rem !important;
+        margin-bottom: 0.6rem !important;
+        margin-top: 0.8rem !important;
     }
     
     h4 {
         color: #fafafa !important;
-        font-size: 1.5rem !important;
+        font-size: 1.1rem !important;
         font-weight: 600 !important;
-        margin-bottom: 0.8rem !important;
+        margin-bottom: 0.4rem !important;
+        margin-top: 0.6rem !important;
     }
     
     /* Premium metric cards with glassmorphism - Dark theme */
@@ -388,17 +390,17 @@ st.markdown("""
         transform: translateY(-1px) scale(0.98);
     }
     
-    /* Enhanced input fields - Dark theme with larger fonts */
+    /* Enhanced input fields - Compact for form */
     .stNumberInput>div>div>input, 
     .stSelectbox>div>div>select,
     .stTextInput>div>div>input {
-        border-radius: 14px;
+        border-radius: 10px;
         border: 2px solid rgba(102, 126, 234, 0.4);
         background: rgba(38, 39, 48, 0.9);
         color: #fafafa;
         transition: all 0.3s ease;
-        padding: 1rem 1.3rem;
-        font-size: 1.1rem !important;
+        padding: 0.6rem 0.9rem;
+        font-size: 0.9rem !important;
         font-weight: 500;
     }
     
@@ -406,28 +408,28 @@ st.markdown("""
     .stSelectbox>div>div>select:focus,
     .stTextInput>div>div>input:focus {
         border-color: #667eea;
-        box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.3),
-                    0 6px 20px rgba(102, 126, 234, 0.25);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3),
+                    0 4px 12px rgba(102, 126, 234, 0.25);
         background: rgba(38, 39, 48, 1);
         outline: none;
         color: #fafafa;
-        transform: scale(1.02);
+        transform: scale(1.01);
     }
     
     /* Selectbox options */
     .stSelectbox>div>div>select option {
         background: #262730;
         color: #fafafa;
-        font-size: 1.1rem;
-        padding: 0.8rem;
+        font-size: 0.9rem;
+        padding: 0.6rem;
     }
     
-    /* Labels - Larger fonts */
+    /* Labels - Compact fonts */
     label {
         color: #e0e0e0 !important;
-        font-size: 1.15rem !important;
+        font-size: 0.95rem !important;
         font-weight: 600 !important;
-        margin-bottom: 0.5rem !important;
+        margin-bottom: 0.3rem !important;
     }
     
     /* Enhanced expanders - Dark theme */
@@ -602,20 +604,35 @@ st.markdown("""
         font-size: 1.1rem !important;
     }
     
-    /* Slider styling - Larger */
+    /* Slider styling - Compact */
     .stSlider>div>div>div {
         background: rgba(102, 126, 234, 0.4);
-        height: 10px;
+        height: 8px;
     }
     
     .stSlider>div>div>div>div {
         background: linear-gradient(135deg, #667eea, #764ba2);
-        height: 10px;
+        height: 8px;
     }
     
     .stSlider label {
-        font-size: 1.15rem !important;
+        font-size: 0.95rem !important;
         font-weight: 600 !important;
+    }
+    
+    /* Reduce spacing in form columns */
+    .element-container {
+        margin-bottom: 0.5rem !important;
+    }
+    
+    /* Compact form sections */
+    [data-testid="stForm"] {
+        padding: 0.5rem 0 !important;
+    }
+    
+    /* Reduce spacing between form elements */
+    .stForm > div {
+        margin-bottom: 0.3rem !important;
     }
     
     /* Success/Error/Info/Warning messages - Larger fonts */
