@@ -13,6 +13,13 @@ import logging
 import json
 
 # -----------------------------
+# Configure joblib for containerized environments
+# -----------------------------
+# Set joblib temp folder to avoid /dev/shm issues in containers
+os.environ['JOBLIB_TEMP_FOLDER'] = '/tmp/joblib_temp'
+os.makedirs('/tmp/joblib_temp', exist_ok=True)
+
+# -----------------------------
 # Ensure logs folder exists
 # -----------------------------
 log_dir = "logs"
@@ -47,6 +54,13 @@ app = FastAPI(
 model_lgb  = joblib.load("../artifacts/model/fraud_model.pkl")
 
 preprocessor = joblib.load("../artifacts/preprocessor.pkl")
+# Force sequential processing to avoid parallel processing issues in containerized environments
+preprocessor.n_jobs = 1
+# Also set n_jobs on nested transformers if they exist
+if hasattr(preprocessor, 'named_transformers_'):
+    for name, transformer in preprocessor.named_transformers_.items():
+        if hasattr(transformer, 'n_jobs'):
+            transformer.n_jobs = 1
 
 shap_background = np.load("../artifacts/shap_background.npy", allow_pickle=True)
 
