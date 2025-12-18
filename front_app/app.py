@@ -208,8 +208,18 @@ st.markdown("""
         color: #fafafa !important;
         font-size: 1.1rem !important;
         font-weight: 600 !important;
-        margin-bottom: 0.4rem !important;
-        margin-top: 0.6rem !important;
+        margin-bottom: 0.3rem !important;
+        margin-top: 0.4rem !important;
+    }
+    
+    /* Compact spacing for results column */
+    [data-testid="column"]:nth-of-type(2) h4 {
+        margin-top: 0.3rem !important;
+        margin-bottom: 0.2rem !important;
+    }
+    
+    [data-testid="column"]:nth-of-type(2) .element-container {
+        margin-bottom: 0.3rem !important;
     }
     
     /* Premium metric cards with glassmorphism - Dark theme */
@@ -246,50 +256,50 @@ st.markdown("""
                     0 0 0 1px rgba(102, 126, 234, 0.4) inset;
     }
     
-    /* Decision cards - Dark theme with larger fonts */
+    /* Decision cards - Compact for above-the-fold display */
     .decision-block {
         background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 50%, #c92a2a 100%);
         color: white;
-        padding: 1.5rem 2rem;
-        border-radius: 16px;
+        padding: 0.8rem 1.2rem;
+        border-radius: 12px;
         text-align: center;
         font-weight: 800;
-        font-size: 1.6rem !important;
-        box-shadow: 0 15px 40px rgba(238, 90, 111, 0.5),
-                    0 0 0 2px rgba(255, 255, 255, 0.15) inset;
-        margin: 1rem 0;
-        border: 2px solid rgba(255, 255, 255, 0.25);
-        letter-spacing: 0.5px;
+        font-size: 1.2rem !important;
+        box-shadow: 0 8px 20px rgba(238, 90, 111, 0.4),
+                    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+        margin: 0.4rem 0;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        letter-spacing: 0.3px;
     }
     
     .decision-step {
         background: linear-gradient(135deg, #ffd43b 0%, #ffa94d 50%, #f08c00 100%);
         color: white;
-        padding: 1.5rem 2rem;
-        border-radius: 16px;
+        padding: 0.8rem 1.2rem;
+        border-radius: 12px;
         text-align: center;
         font-weight: 800;
-        font-size: 1.6rem !important;
-        box-shadow: 0 15px 40px rgba(255, 168, 77, 0.5),
-                    0 0 0 2px rgba(255, 255, 255, 0.15) inset;
-        margin: 1rem 0;
-        border: 2px solid rgba(255, 255, 255, 0.25);
-        letter-spacing: 0.5px;
+        font-size: 1.2rem !important;
+        box-shadow: 0 8px 20px rgba(255, 168, 77, 0.4),
+                    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+        margin: 0.4rem 0;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        letter-spacing: 0.3px;
     }
     
     .decision-allow {
         background: linear-gradient(135deg, #51cf66 0%, #40c057 50%, #2b8a3e 100%);
         color: white;
-        padding: 1.5rem 2rem;
-        border-radius: 16px;
+        padding: 0.8rem 1.2rem;
+        border-radius: 12px;
         text-align: center;
         font-weight: 800;
-        font-size: 1.6rem !important;
-        box-shadow: 0 15px 40px rgba(64, 192, 87, 0.5),
-                    0 0 0 2px rgba(255, 255, 255, 0.15) inset;
-        margin: 1rem 0;
-        border: 2px solid rgba(255, 255, 255, 0.25);
-        letter-spacing: 0.5px;
+        font-size: 1.2rem !important;
+        box-shadow: 0 8px 20px rgba(64, 192, 87, 0.4),
+                    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+        margin: 0.4rem 0;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        letter-spacing: 0.3px;
     }
     
     .metric-card:hover::before {
@@ -905,17 +915,17 @@ with tab1:
                 
 
 
-                # Fraud Score Gauge
+                # Fraud Score Gauge (without number/delta display) - Compact
                 st.markdown("#### Fraud Risk Score")
+                # Reduce spacing
+                st.markdown("<div style='margin-bottom: 0.3rem;'></div>", unsafe_allow_html=True)
                 fig = go.Figure(go.Indicator(
-                    mode = "gauge+number+delta",
+                    mode = "gauge",
                     value = fraud_score,
                     domain = {'x': [0, 1], 'y': [0, 1]},
-                    title = {'text': "Risk Score"},
-                    delta = {'reference': 0.5},
-                    number = {'valueformat': '.3f'},
+                    title = {'text': "Risk Score", 'font': {'size': 14}},
                     gauge = {
-                        'axis': {'range': [None, 1]},
+                        'axis': {'range': [None, 1], 'tickfont': {'size': 10}},
                         'bar': {'color': get_decision_color(decision)},
                         'steps': [
                             {'range': [0, 0.4], 'color': "lightgray"},
@@ -923,29 +933,27 @@ with tab1:
                             {'range': [0.6, 1], 'color': "red"}
                         ],
                         'threshold': {
-                            'line': {'color': "red", 'width': 4},
-                            'thickness': 0.75,
+                            'line': {'color': "red", 'width': 3},
+                            'thickness': 0.6,
                             'value': 0.6
                         }
                     }
                 ))
-                fig.update_layout(height=230, margin={'t': 10, 'b': 10, 'l': 0, 'r': 0})
+                fig.update_layout(height=150, margin={'t': 5, 'b': 5, 'l': 10, 'r': 10})
                 st.plotly_chart(fig, use_container_width=True)
                 
-                # Decision Card
+                # Decision Card - Compact
+                st.markdown("<div style='margin-top: 0.5rem;'></div>", unsafe_allow_html=True)
                 st.markdown("#### Decision")
                 decision_icon = get_decision_icon(decision)
                 decision_color = get_decision_color(decision)
                 
                 if decision == "BLOCK":
                     st.markdown(f'<div class="decision-block">{decision_icon} {decision}</div>', unsafe_allow_html=True)
-                    st.warning("⚠️ This transaction has been flagged as high risk and should be blocked.")
                 elif decision == "STEP_UP":
                     st.markdown(f'<div class="decision-step">{decision_icon} {decision}</div>', unsafe_allow_html=True)
-                    st.info("⚠️ Additional verification is recommended for this transaction.")
                 else:
                     st.markdown(f'<div class="decision-allow">{decision_icon} {decision}</div>', unsafe_allow_html=True)
-                    st.success("✅ This transaction appears to be low risk.")
                 
                 # Reason Codes - Display prominently right after decision (always 3 reasons)
                 if decision in ["BLOCK", "STEP_UP"]:
