@@ -929,7 +929,7 @@ with tab1:
                         }
                     }
                 ))
-                fig.update_layout(height=230, margin={'t': 10, 'b': 0, 'l': 0, 'r': 0})
+                fig.update_layout(height=230, margin={'t': 10, 'b': 10, 'l': 0, 'r': 0})
                 st.plotly_chart(fig, use_container_width=True)
                 
                 # Decision Card
