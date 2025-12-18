@@ -6,6 +6,8 @@ import plotly.express as px
 from datetime import datetime
 import time
 import json
+import turtle
+
 
 # ======================
 # Page Configuration
@@ -98,25 +100,34 @@ st.set_page_config(
 # """, unsafe_allow_html=True)
 
 
-# Custom CSS for ultra-stylish professional dark theme design
+# Custom CSS for ultra-stylish professional dark theme design with larger fonts
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap');
     
-    /* Dark theme base */
+    /* Dark theme base with enhanced gradient */
     .stApp {
-        background: linear-gradient(180deg, #0a0d14 0%, #0e1117 50%, #1a1d29 100%);
+        background: linear-gradient(180deg, #0a0d14 0%, #0e1117 30%, #1a1d29 70%, #0e1117 100%);
+        font-size: 18px;
     }
     
     .main .block-container {
         background: transparent;
+        padding-top: 2rem;
+        padding-bottom: 3rem;
     }
     
     * {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
-    /* Main header with glassmorphism - compact for above-the-fold layout */
+    /* Base font size increase */
+    body, p, div, span {
+        font-size: 18px !important;
+        line-height: 1.7 !important;
+    }
+    
+    /* Main header with reduced brightness and original font sizes */
     .main-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
         padding: 1.6rem 1.4rem;
@@ -124,8 +135,8 @@ st.markdown("""
         color: white;
         text-align: center;
         margin-bottom: 1.2rem;
-        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4),
-                    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3),
+                    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
         position: relative;
         overflow: hidden;
         backdrop-filter: blur(10px);
@@ -138,18 +149,18 @@ st.markdown("""
         right: -50%;
         width: 200%;
         height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
         animation: pulse 8s ease-in-out infinite;
     }
     
     @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 0.5; }
-        50% { transform: scale(1.1); opacity: 0.8; }
+        0%, 100% { transform: scale(1); opacity: 0.4; }
+        50% { transform: scale(1.1); opacity: 0.6; }
     }
     
     .main-header h1 {
         color: white;
-        font-size: 2.2rem;
+        font-size: 2.2rem !important;
         font-weight: 800;
         margin-bottom: 0.3rem;
         text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
@@ -160,7 +171,7 @@ st.markdown("""
     
     .main-header p {
         color: rgba(255, 255, 255, 0.95);
-        font-size: 1rem;
+        font-size: 1rem !important;
         margin: 0;
         font-weight: 300;
         position: relative;
@@ -170,23 +181,33 @@ st.markdown("""
     
     /* Enhanced section headers - Dark theme */
     .section-header {
-        background: linear-gradient(135deg, rgba(38, 39, 48, 0.95) 0%, rgba(30, 33, 43, 0.95) 100%);
-        padding: 1.2rem 2rem;
-        border-left: 5px solid;
-        border-image: linear-gradient(135deg, #667eea, #764ba2) 1;
-        border-radius: 12px;
-        margin: 2rem 0 1.5rem 0;
-        font-size: 1.4rem;
-        font-weight: 700;
+        background: linear-gradient(135deg, rgba(38, 39, 48, 0.98) 0%, rgba(30, 33, 43, 0.98) 100%);
+        padding: 1.8rem 2.5rem;
+        border-left: 6px solid;
+        border-image: linear-gradient(135deg, #667eea, #764ba2, #f093fb) 1;
+        border-radius: 16px;
+        margin: 2.5rem 0 2rem 0;
+        font-size: 1.8rem !important;
+        font-weight: 800;
         color: #fafafa;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3),
-                    0 0 0 1px rgba(102, 126, 234, 0.2) inset;
-        letter-spacing: -0.3px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4),
+                    0 0 0 1px rgba(102, 126, 234, 0.3) inset;
+        letter-spacing: -0.5px;
     }
     
-    /* Section headers (h3, h4) */
-    h3, h4 {
+    /* Section headers (h3, h4) - Larger fonts */
+    h3 {
         color: #fafafa !important;
+        font-size: 1.8rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    h4 {
+        color: #fafafa !important;
+        font-size: 1.5rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 0.8rem !important;
     }
     
     /* Premium metric cards with glassmorphism - Dark theme */
@@ -223,47 +244,50 @@ st.markdown("""
                     0 0 0 1px rgba(102, 126, 234, 0.4) inset;
     }
     
-    /* Decision cards - Dark theme */
+    /* Decision cards - Dark theme with larger fonts */
     .decision-block {
         background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 50%, #c92a2a 100%);
         color: white;
-        padding: 1rem 1.4rem;
-        border-radius: 12px;
+        padding: 1.5rem 2rem;
+        border-radius: 16px;
         text-align: center;
-        font-weight: 700;
-        font-size: 1.2rem;
-        box-shadow: 0 10px 30px rgba(238, 90, 111, 0.4),
-                    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-        margin: 0.6rem 0;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        font-weight: 800;
+        font-size: 1.6rem !important;
+        box-shadow: 0 15px 40px rgba(238, 90, 111, 0.5),
+                    0 0 0 2px rgba(255, 255, 255, 0.15) inset;
+        margin: 1rem 0;
+        border: 2px solid rgba(255, 255, 255, 0.25);
+        letter-spacing: 0.5px;
     }
     
     .decision-step {
         background: linear-gradient(135deg, #ffd43b 0%, #ffa94d 50%, #f08c00 100%);
         color: white;
-        padding: 1rem 1.4rem;
-        border-radius: 12px;
+        padding: 1.5rem 2rem;
+        border-radius: 16px;
         text-align: center;
-        font-weight: 700;
-        font-size: 1.2rem;
-        box-shadow: 0 10px 30px rgba(255, 168, 77, 0.4),
-                    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-        margin: 0.6rem 0;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        font-weight: 800;
+        font-size: 1.6rem !important;
+        box-shadow: 0 15px 40px rgba(255, 168, 77, 0.5),
+                    0 0 0 2px rgba(255, 255, 255, 0.15) inset;
+        margin: 1rem 0;
+        border: 2px solid rgba(255, 255, 255, 0.25);
+        letter-spacing: 0.5px;
     }
     
     .decision-allow {
         background: linear-gradient(135deg, #51cf66 0%, #40c057 50%, #2b8a3e 100%);
         color: white;
-        padding: 1rem 1.4rem;
-        border-radius: 12px;
+        padding: 1.5rem 2rem;
+        border-radius: 16px;
         text-align: center;
-        font-weight: 700;
-        font-size: 1.2rem;
-        box-shadow: 0 10px 30px rgba(64, 192, 87, 0.4),
-                    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-        margin: 0.6rem 0;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        font-weight: 800;
+        font-size: 1.6rem !important;
+        box-shadow: 0 15px 40px rgba(64, 192, 87, 0.5),
+                    0 0 0 2px rgba(255, 255, 255, 0.15) inset;
+        margin: 1rem 0;
+        border: 2px solid rgba(255, 255, 255, 0.25);
+        letter-spacing: 0.5px;
     }
     
     .metric-card:hover::before {
@@ -318,19 +342,19 @@ st.markdown("""
         background: linear-gradient(180deg, #1a1f3a 0%, #2c3e50 50%, #34495e 100%);
     }
     
-    /* Premium button styling */
+    /* Premium button styling - Larger fonts */
     .stButton>button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
         color: white;
         font-weight: 700;
-        padding: 1rem 3rem;
-        border-radius: 12px;
+        padding: 1.2rem 3.5rem;
+        border-radius: 16px;
         border: none;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3),
-                    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-        font-size: 1.1rem;
-        letter-spacing: 0.5px;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4),
+                    0 0 0 2px rgba(255, 255, 255, 0.15) inset;
+        font-size: 1.3rem !important;
+        letter-spacing: 0.8px;
         text-transform: uppercase;
         position: relative;
         overflow: hidden;
@@ -364,39 +388,46 @@ st.markdown("""
         transform: translateY(-1px) scale(0.98);
     }
     
-    /* Enhanced input fields - Dark theme */
+    /* Enhanced input fields - Dark theme with larger fonts */
     .stNumberInput>div>div>input, 
     .stSelectbox>div>div>select,
     .stTextInput>div>div>input {
-        border-radius: 12px;
-        border: 2px solid rgba(102, 126, 234, 0.3);
-        background: rgba(38, 39, 48, 0.8);
+        border-radius: 14px;
+        border: 2px solid rgba(102, 126, 234, 0.4);
+        background: rgba(38, 39, 48, 0.9);
         color: #fafafa;
         transition: all 0.3s ease;
-        padding: 0.75rem 1rem;
-        font-size: 0.95rem;
+        padding: 1rem 1.3rem;
+        font-size: 1.1rem !important;
+        font-weight: 500;
     }
     
     .stNumberInput>div>div>input:focus, 
     .stSelectbox>div>div>select:focus,
     .stTextInput>div>div>input:focus {
         border-color: #667eea;
-        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.25),
-                    0 4px 12px rgba(102, 126, 234, 0.2);
+        box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.3),
+                    0 6px 20px rgba(102, 126, 234, 0.25);
         background: rgba(38, 39, 48, 1);
         outline: none;
         color: #fafafa;
+        transform: scale(1.02);
     }
     
     /* Selectbox options */
     .stSelectbox>div>div>select option {
         background: #262730;
         color: #fafafa;
+        font-size: 1.1rem;
+        padding: 0.8rem;
     }
     
-    /* Labels */
+    /* Labels - Larger fonts */
     label {
         color: #e0e0e0 !important;
+        font-size: 1.15rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 0.5rem !important;
     }
     
     /* Enhanced expanders - Dark theme */
@@ -473,19 +504,17 @@ st.markdown("""
         border-radius: 10px;
     }
     
-    /* Metrics styling */
+    /* Metrics styling - Larger fonts */
     [data-testid="stMetricValue"] {
-        font-weight: 700;
-        font-size: 2rem;
+        font-weight: 800;
+        font-size: 2.8rem !important;
+        color: #fafafa !important;
     }
     
     [data-testid="stMetricLabel"] {
-        font-weight: 500;
+        font-weight: 600;
         color: #b0b0b0;
-    }
-    
-    [data-testid="stMetricValue"] {
-        color: #fafafa;
+        font-size: 1.2rem !important;
     }
     
     /* Hide some Streamlit default elements but keep header (for sidebar toggle button) */
@@ -550,23 +579,65 @@ st.markdown("""
         color: #fafafa !important;
     }
     
-    /* Text colors */
+    /* Text colors - Larger fonts */
     p, div, span {
         color: #e0e0e0;
+        font-size: 1.1rem !important;
+        line-height: 1.8 !important;
     }
     
     /* Markdown text */
     .stMarkdown {
         color: #e0e0e0;
+        font-size: 1.1rem !important;
+        line-height: 1.8 !important;
     }
     
-    /* Slider styling */
+    /* Sidebar styling - Larger fonts */
+    [data-testid="stSidebar"] {
+        font-size: 1.1rem !important;
+    }
+    
+    [data-testid="stSidebar"] label {
+        font-size: 1.1rem !important;
+    }
+    
+    /* Slider styling - Larger */
     .stSlider>div>div>div {
-        background: rgba(102, 126, 234, 0.3);
+        background: rgba(102, 126, 234, 0.4);
+        height: 10px;
     }
     
     .stSlider>div>div>div>div {
         background: linear-gradient(135deg, #667eea, #764ba2);
+        height: 10px;
+    }
+    
+    .stSlider label {
+        font-size: 1.15rem !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Success/Error/Info/Warning messages - Larger fonts */
+    .stSuccess, .stError, .stInfo, .stWarning {
+        font-size: 1.15rem !important;
+        padding: 1.2rem !important;
+        border-radius: 14px !important;
+    }
+    
+    /* Dataframe styling - Larger fonts */
+    .dataframe {
+        font-size: 1.05rem !important;
+    }
+    
+    .dataframe th {
+        font-size: 1.1rem !important;
+        font-weight: 700 !important;
+    }
+    
+    .dataframe td {
+        font-size: 1.05rem !important;
+        padding: 0.8rem !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -610,6 +681,22 @@ def predict_fraud(transaction_data):
     except requests.exceptions.RequestException as e:
         return None, str(e)
 
+def download_logs():
+    """Download model logs from API"""
+    try:
+        response = requests.get(f"{API_BASE_URL}/logs", timeout=10)
+        response.raise_for_status()
+        
+        # Check if response is JSON error
+        content_type = response.headers.get('content-type', '')
+        if 'application/json' in content_type:
+            error_data = response.json()
+            return None, error_data.get('error', 'Unknown error from API')
+        
+        return response.content, None
+    except requests.exceptions.RequestException as e:
+        return None, str(e)
+
 def get_decision_color(decision):
     """Get color based on decision"""
     if decision == "BLOCK":
@@ -641,7 +728,7 @@ st.markdown("""
             ⚡ Real-Time Analysis
         </span>
         <span style='background: rgba(255,255,255,0.2); padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.9rem; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3);'>
-            🎯 98% Accuracy
+            ⚖️Scalable
         </span>
         <span style='background: rgba(255,255,255,0.2); padding: 0.5rem 1.5rem; border-radius: 20px; font-size: 0.9rem; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3);'>
             🔒 Secure & Reliable
@@ -658,6 +745,28 @@ with st.sidebar:
     else:
         st.error("❌ API Not Available")
         st.info("Please ensure the API is running and the URL is correct.")
+    
+    st.markdown("---")
+    
+    # Always show download button, check API health when clicked
+    if st.button("📥 Download Model Logs", use_container_width=True, help="Download the complete fraud detection API logs"):
+        if check_api_health():
+            with st.spinner("Downloading logs..."):
+                log_content, error = download_logs()
+                if error:
+                    st.error(f"❌ Error: {error}")
+                elif log_content:
+                    st.download_button(
+                        label="💾 Save Log File",
+                        data=log_content,
+                        file_name=f"fraud_api_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log",
+                        mime="text/plain",
+                        use_container_width=True
+                    )
+                else:
+                    st.warning("⚠️ No log content received from API")
+        else:
+            st.error("❌ API is not connected. Please check the API status above.")
 
 # Main content area
 col1, col2 = st.columns([1, 1])

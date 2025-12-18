@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import numpy as np
 import pandas as pd
@@ -156,6 +157,22 @@ class Transaction(BaseModel):
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+# ======================
+# Download logs endpoint
+# ======================
+@app.get("/logs")
+def download_logs():
+    """Download the fraud detection API logs"""
+    log_file_path = os.path.join(log_dir, "fraud_api.log")
+    if os.path.exists(log_file_path):
+        return FileResponse(
+            log_file_path,
+            media_type="text/plain",
+            filename="fraud_api.log"
+        )
+    else:
+        return {"error": "Log file not found"}
 
 # ======================
 # Prediction endpoint
